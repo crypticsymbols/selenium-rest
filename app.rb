@@ -1,4 +1,12 @@
-require_relative 'lib/notifier'
+#
+#
+#
+# todo: instead of default to success, default to failure if no success string.
+#
+#
+#
+
+require_relative 'lib/SeleniumRunner'
 require_relative 'config/vars'
 require 'sinatra'
 
@@ -33,36 +41,18 @@ get '/:name' do
         test_files << file
       end
 
-      # 
-      # Run in a thread so sinatra can return an HTTP response quickly.
-      #
-      Thread.new { 
+      if (!test_files.empty?)
 
-        errors = ''
+        tests = SeleniumRunner.new(test_files, site)
+        tests.run
+        "SUCCESS: Tests are now running for #{site}."
 
-          test_files.each do |t|
+      else
 
-            # 
-            # Run the selenium test and give us a variable
-            # containing its output.
-            # 
-            message = `ruby #{t}`
+        "FAILURE: No test files found in directory."
 
-            if message.include? "Error:"
-              errors << message
-              errors << '<br/>'
-            end
+      end
 
-          end
-
-          if (!errors.empty?)
-            title = "Selenium Test failure report"
-            Notifier.new(LOG_EMAIL_SENDER, LOG_EMAIL_RECIPIENT, title, errors)
-          end
-
-      }
-
-      "SUCCESS: Tests are now running for #{site}."
 
     else
 
