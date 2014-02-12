@@ -20,6 +20,4 @@ end
 
 after "drupal:restart_apache", "testing:selenium"
 
-On staging only, of course...
-
 Happy testing!
